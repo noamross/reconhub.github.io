@@ -25,16 +25,15 @@ import_memberships <- function(base = "app8BI6aTKIuB9U9y") {
   members
 }
 
-# #' Fetch the profile pics of all members (not needed, as we link directly to
-# #' the AirTable Source)
-# download_profile_images <- function(members, fdir = "img/people") {
-#   if (!dir.exists(fdir)) dir.create(fdir)
-#   m2 <- members |>
-#     filter(!is.na(photo_url), !is.na(photo_filename))
-#   walk2(m2$photo_url, m2$photo_filename, function(furl, fname) {
-#     download.file(furl, file.path(fdir, fname))
-#   })
-# }
+#' Fetch the profile pics of all members
+download_profile_images <- function(members, fdir = "img/people") {
+ if (!dir.exists(fdir)) dir.create(fdir)
+ m2 <- members |>
+   filter(!is.na(photo_url), !is.na(photo_filename))
+ walk2(m2$photo_url, m2$photo_filename, function(furl, fname) {
+   download.file(furl, file.path(fdir, fname))
+ })
+}
 
 #' Convert members data to YAML that will be used in
 #' Removes nonallowed URLs rather than fixing, assuming fixes upstream
@@ -50,7 +49,7 @@ make_members_data <- function(members) {
       group |>
         mutate(name = paste(first_name, last_name),
                desc = paste(position_and_expertise_short, institution, country, sep  = ", "),
-               img = photo_url
+               img = file.path("/img/people", photo_filename)
         ) |>
         select(name, desc, img, website, twitter, github) |>
         mutate(across(c(website,twitter,github),
